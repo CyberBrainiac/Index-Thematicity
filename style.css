@@ -1,0 +1,86 @@
+.page {
+  background-color: rgb(225, 243, 237);
+  width: 100%;
+}
+
+.pageContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* .selectFile { text-align: center; } */
+
+.outputTable {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+.outputTable th {
+  color: rgb(10, 121, 121);
+  padding: 0 20px;
+  font-size: 24px;
+}
+
+.outputTable__body tr td {
+  transition: 0.5s;
+  border: 1px dashed rgb(54, 140, 100);
+  text-align: center;
+}
+
+.outputTable__body tr > td:first-child {
+  text-align: left;
+  font-size: 18px;
+}
+
+.highlight {
+  background-color: aqua;
+}
+
+/*Custom button*/
+.selectFile {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.selectFile input[type="file"] {
+  position: absolute;
+  opacity: 0;
+}
+.selectFile button {
+  background-color: beige;
+  border-radius: 10px;
+  border: 3px solid black;
+  padding: 10px 0;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.selectFile button:hover {
+  background-color: rgb(245, 245, 188);
+  border-radius: 30px;
+}
+
+/*Custom Check-box*/
+.check-button {
+  display: flex;
+  justify-content: center;
+}
+.check-button label {
+  font-size: 0.8em;
+  color: rgb(119, 149, 149);
+}
+
+#myCheckbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.unvalid {
+  border: 3px solid red;
+}

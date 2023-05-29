@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+
+  <body class="page">
+    <main class="pageContent">
+      <div class="selectFile">
+        <h2>Select XLSX File</h2>
+        <input
+          type="file"
+          id="xlsxFileInput"
+          accept=".xlsx"
+          onchange="handleFile(this)"
+        />
+        <button onclick="document.getElementById('xlsxFileInput').click()">
+          Select Files
+        </button>
+      </div>
+
+      <form class="searchForm">
+        <p style="color: red">
+          This field is analog of query "site:example.com" in google search. If the site is <span class="importantInf">specified<span> search only for this site, else search for <span class="importantInf">all</span> sites from table.
+
+					DO IT STIKY!!!
+        </p>
+        <input
+          type="text"
+          class="searchForm__inputUrl"
+          placeholder="url/example.com"
+					disabled
+        />
+        <p>Any query as in google search.</p>
+        <input
+          type="text"
+          class="searchForm__inputQuery"
+          placeholder='intitle:"windows"'
+					disabled
+        />
+        <input type="submit" value="Search" class="searchForm__button" disabled />
+      </form>
+
+      <table class="outputTable">
+        <thead>
+          <tr>
+            <th>Url</th>
+            <th>Total page</th>
+            <th>Target page</th>
+            <th>
+              Thematic index
+              <br />
+              <div class="check-button">
+                <label for="myCheckbox">sort index</label>
+                <input type="checkbox" id="myCheckbox" disabled />
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="outputTable__body"></tbody>
+      </table>
+    </main>
+
+    <script lang="javascript" src="scripts/xlsx.full.min.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/connectAPI.js"></script>
+  </body>
+</html>
