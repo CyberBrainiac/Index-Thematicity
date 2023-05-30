@@ -38,7 +38,11 @@
             <div class="searchForm__help_toggle">i</div>
             <div class="searchForm__help_information">
               <p>
-                This field is analog of query "site:example.com" in google search. If the site is <span class="importantInf">specified</span> search only for this site, else search for <span class="importantInf">all</span> sites from table.
+                This field is analog of query "site:example.com" in google
+                search. If the site is
+                <span class="importantInf">specified</span> search only for this
+                site, else search for
+                <span class="importantInf">all</span> sites from table.
               </p>
             </div>
           </div>
@@ -61,7 +65,9 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="searchForm__button" disabled>Search in Google</button>
+        <button type="submit" class="searchForm__button" disabled>
+          Search in Google
+        </button>
       </form>
 
       <table class="outputTable">
@@ -74,14 +80,22 @@
               Thematic index
               <br />
               <div class="check-button">
-                <label for="myCheckbox">sort index</label>
+                <label for="myCheckbox">sort</label>
                 <input type="checkbox" id="myCheckbox" disabled />
+                <input
+                  type="button"
+                  id="copyThematicIndex_button"
+                  value="copy"
+                  disabled
+                />
               </div>
             </th>
           </tr>
         </thead>
         <tbody class="outputTable__body"></tbody>
       </table>
+
+      <div class="errorContainer"></div>
     </main>
 
     <script lang="javascript" src="scripts/xlsx.full.min.js"></script>

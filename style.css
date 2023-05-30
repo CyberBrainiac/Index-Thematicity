@@ -50,7 +50,6 @@ button:hover {
   opacity: 0;
 }
 
-
 /*Form Style*/
 .searchForm {
   display: flex;
@@ -71,7 +70,6 @@ button:hover {
   border: 3px solid red;
 }
 
-
 /*Form Help container style*/
 .searchForm__help {
   position: relative;
@@ -91,8 +89,12 @@ button:hover {
   font-style: italic;
 }
 
-.searchForm__help_information { display: none; }
-.importantInf { color: rgb(207, 55, 55); }
+.searchForm__help_information {
+  display: none;
+}
+.importantInf {
+  color: rgb(207, 55, 55);
+}
 
 .activeInformation {
   display: block;
@@ -103,11 +105,20 @@ button:hover {
   width: 160px;
 }
 
+#copyThematicIndex_button {
+  font-size: 0.8em;
+  color: rgb(119, 149, 149);
+  width: 100px;
+  background-color: beige;
+  border-radius: 10px;
+  border: 1px solid black;
+}
 
 /*Table Style*/
 .outputTable {
   border-collapse: separate;
   border-spacing: 0 6px;
+  margin-top: 40px;
 }
 
 .outputTable th {
@@ -132,7 +143,6 @@ button:hover {
   background-color: aqua;
 }
 
-
 /*Custom Check-box*/
 .check-button {
   display: flex;
@@ -148,4 +158,9 @@ button:hover {
   height: 20px;
   background-color: #ccc;
   border-radius: 4px;
+}
+
+.errorContainer {
+  font-size: 18px;
+  color: red;
 }

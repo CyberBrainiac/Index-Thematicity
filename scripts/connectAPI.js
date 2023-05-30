@@ -6,53 +6,68 @@ function connectApi(arrURL_objects, formData) {
 
   /**CHANGE 2 VALUES ABOVE AND SAVE*/
 
+  const query = formData.get("inputQuery");
+  const sites = JSON.parse(formData.get("url"));
+  const errorContainer = document.querySelector(".errorContainer");
 
-  const query = formData.get('inputQuery');
-  const sites = JSON.parse(formData.get('url'));
+  while (errorContainer.firstChild) {
+    errorContainer.removeChild(errorContainer.firstChild); //clear error container
+  }
 
-  calculateRatio().then((arrURL_objects) => {
-    asyncReturnValue(arrURL_objects);
-  })
-  .catch((error) => {
-    alert("something broken ;(");
-    console.error(error);
-  });
+  calculateIndex()
+    .then((arrURL_objects) => {
+      asyncReturnValue(arrURL_objects);
+    })
+    .catch((error) => {
+      alert("something broken ;(");
+      console.error(error);
+    });
 
-  async function calculateRatio() {
+  async function calculateIndex() {
     for (const site of sites) {
-
       await waitDONTspum();
       const targetPage = await searchWithQuery(site);
       let thematicIndex = 0;
 
       for (const obj of arrURL_objects) {
-        if(obj.url === site) {
-          obj.targetPage = targetPage;
+        if (obj.url === site) {
+          if (targetPage === null) {
+            obj.targetPage = "";
+          } else {
+            obj.targetPage = targetPage;
+          }
 
           /**If we have totalPage value, we wont do one more request*/
-          if(obj.totalPage) {
+          if (obj.totalPage) {
             thematicIndex = targetPage / obj.totalPage;
             let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
             obj.thematicIndex = truncatedThematicIndex;
-
           } else {
             await waitDONTspum();
             const totalPage = await searchSite(site);
-            thematicIndex = targetPage / totalPage;
-            let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
-            obj.thematicIndex = truncatedThematicIndex;
-            obj.totalPage = totalPage;
+
+            if (totalPage === null) {
+              obj.totalPage = "";
+              obj.thematicIndex = "";
+            } else {
+              thematicIndex = targetPage / totalPage;
+              let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
+              obj.thematicIndex = truncatedThematicIndex;
+              obj.totalPage = totalPage;
+            }
           }
         }
       }
-      createTableRow(arrURL_objects) //update table in real time
+      createTableRow(arrURL_objects); //update table in real time
     }
 
     return arrURL_objects;
-  };
+  }
 
   async function searchWithQuery(site) {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}%20site:${site}&fields=searchInformation`;
+    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(
+      query
+    )}%20site:${site}&fields=searchInformation`;
     let response;
 
     try {
@@ -61,18 +76,14 @@ function connectApi(arrURL_objects, formData) {
       console.error(error);
     }
 
-    if(response.ok) {
+    if (response.ok) {
       console.log(2);
       const json = await response.json();
-      console.log(
-        site,
-        "target: ",
-        json.searchInformation.totalResults
-      );
+      console.log(site, "target: ", json.searchInformation.totalResults);
       return json.searchInformation.totalResults;
     } else {
-      checkHTTPError(response.status);
-      return '';
+      checkHTTPError(response, site);
+      return null;
     }
   }
 
@@ -86,33 +97,39 @@ function connectApi(arrURL_objects, formData) {
       console.error(error);
     }
 
-    if(response.ok) {
+    if (response.ok) {
       const json = await response.json();
-      console.log(
-        site, 
-        "total: ",
-        json.searchInformation.totalResults
-      );
+      console.log(site, "total: ", json.searchInformation.totalResults);
       return json.searchInformation.totalResults;
     } else {
-      checkHTTPError(response.status);
-      return '';
+      checkHTTPError(response, site);
+      return null;
     }
   }
 
   async function waitDONTspum() {
-    setTimeout(() => console.log("wait 500"), 500);
+    setTimeout(() => {
+      let a = "something";
+    }, 100);
   }
 
-  function checkHTTPError(errCode) {
-    if(errCode === 429) {
-      console.log("Error: too many request to google API");
+  function checkHTTPError(response, site) {
+    const errCode = response.status;
+    let errorMessage = "";
+    let paragraph = document.createElement("p");
+
+    if (errCode === 429) {
+      errorMessage = `Site: ${site}  ||  Error: quota for requests has run out`;
+      console.log(errorMessage);
+    } else if (errCode === 500) {
+      errorMessage = `Site: ${site}  ||  Error: internal server error`;
+      console.log(errorMessage);
+    } else {
+      errorMessage = `Site: ${site}  ||  Error code: ${errCode}`;
+      console.error(errorMessage);
     }
-    else if(errCode === 500) {
-      console.log("Error: internal server error");
-    }
-    else {
-      console.error(`Error code: ${errCode}`);
-    }
+
+    paragraph.textContent = errorMessage;
+    errorContainer.appendChild(paragraph);
   }
 }

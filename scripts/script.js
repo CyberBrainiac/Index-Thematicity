@@ -1,18 +1,25 @@
+const selectFileButton = document.querySelector(".selectFile > button");
+const checkbox = document.getElementById("myCheckbox");
 const searchForm__button = document.querySelector(".searchForm__button");
 const searchForm = document.querySelector(".searchForm");
 const searchForm__helps = document.querySelectorAll(".searchForm__help");
+const copyThematicIndex_button = document.getElementById(
+  "copyThematicIndex_button"
+);
 
 let arrURL_objects = [];
 searchForm.addEventListener("submit", searchForm_handler);
 searchForm__helps.forEach((elem) => {
   elem.addEventListener("click", searchForm__help_handler);
 });
+copyThematicIndex_button.addEventListener(
+  "click",
+  copyThematicIndex_button_handler
+);
 
 function handleFile(input) {
   const file = input.files[0];
   const reader = new FileReader();
-  const selectFileButton = document.querySelector(".selectFile > button");
-  const checkbox = document.getElementById("myCheckbox");
   const searchForm__inputUrl = document.querySelector(".searchForm__inputUrl");
   const searchForm__inputQuery = document.querySelector(
     ".searchForm__inputQuery"
@@ -38,13 +45,13 @@ function handleFile(input) {
     );
 
     tableData.forEach((row, index) => {
-      if (index !== 0) {
+      if (index !== 0 && row[headerURL_index] !== undefined) {
         arrURL_objects.push({
           [Symbol("addedIndex")]: index.toString(),
           url: row[headerURL_index],
-          totalPage: '',
-          targetPage: '',
-          thematicIndex: '',
+          totalPage: "",
+          targetPage: "",
+          thematicIndex: "",
         });
       }
     });
@@ -57,9 +64,10 @@ function handleFile(input) {
     searchForm__inputUrl.disabled = false;
     searchForm__inputQuery.disabled = false;
     searchForm__button.disabled = false;
+    copyThematicIndex_button.disabled = false;
 
     /**Filter table column*/
-    checkbox.addEventListener("change", sortThematicIndex); 
+    checkbox.addEventListener("change", sortThematicIndex);
   };
 
   reader.onerror = (err) => {
@@ -75,7 +83,9 @@ function searchForm_handler(ev) {
   let urlArr = [];
 
   for (const urlObj of arrURL_objects) {
-    Object.entries(urlObj).forEach( ([key, value]) => {if(key === 'url') urlArr.push(value)});
+    Object.entries(urlObj).forEach(([key, value]) => {
+      if (key === "url") urlArr.push(value);
+    });
   }
 
   /**Input validate*/
@@ -89,7 +99,7 @@ function searchForm_handler(ev) {
 
   if (formData.get("inputUrl")) {
     if (urlArr.includes(formData.get("inputUrl"))) {
-      formData.set("url", JSON.stringify( [formData.get("inputUrl")]));
+      formData.set("url", JSON.stringify([formData.get("inputUrl")]));
       searchForm__inputUrl.classList.remove("unvalid");
     } else {
       searchForm__inputUrl.classList.add("unvalid");
@@ -102,6 +112,10 @@ function searchForm_handler(ev) {
 
   /**Call Google API*/
   searchForm__button.disabled = true;
+  copyThematicIndex_button.disabled = true;
+  selectFileButton.disabled = true;
+  checkbox.disabled = true;
+
   arrURL_objects = connectApi(arrURL_objects, formData);
 }
 
@@ -118,7 +132,7 @@ function sortThematicIndex(ev) {
 
 function searchForm__help_handler() {
   const searchForm__help_information = this.children[1];
-  searchForm__help_information.classList.toggle('activeInformation');
+  searchForm__help_information.classList.toggle("activeInformation");
 }
 
 function createTableRow(arrURL_objects) {
@@ -146,6 +160,7 @@ function createTableRow(arrURL_objects) {
 function userClickOnCell_handler(ev) {
   const text = ev.target.textContent;
   navigator.clipboard.writeText(text);
+  copyThematicIndex_button.style.backgroundColor = "beige";
 
   ev.target.classList.toggle("highlight");
   setTimeout(() => {
@@ -157,13 +172,36 @@ function compareURLObject(a, b) {
   return b.thematicIndex - a.thematicIndex;
 }
 
+function copyThematicIndex_button_handler() {
+  let thematicIndexArr = [];
+  let copyStr = "";
+
+  copyThematicIndex_button.style.backgroundColor = "#cbe2be";
+
+  for (const urlObj of arrURL_objects) {
+    Object.entries(urlObj).forEach(([key, value]) => {
+      if (key === "thematicIndex") thematicIndexArr.push(value);
+    });
+  }
+
+  for (const thematicIndex of thematicIndexArr) {
+    copyStr += thematicIndex.toString();
+    copyStr += "\n";
+  }
+
+  navigator.clipboard.writeText(copyStr);
+}
+
 /**Async connectAPI answer*/
 function asyncReturnValue(arrURL) {
   const checkbox = document.getElementById("myCheckbox");
 
+  checkbox.disabled = false;
   checkbox.checked = false;
-  arrURL_objects = arrURL;
-
-  createTableRow(arrURL_objects);
+  copyThematicIndex_button.disabled = false;
+  copyThematicIndex_button.style.backgroundColor = "beige";
   searchForm__button.disabled = false;
+  selectFileButton.disabled = false;
+
+  arrURL_objects = arrURL;
 }
