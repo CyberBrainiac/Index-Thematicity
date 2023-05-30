@@ -1,3 +1,30 @@
+p {
+  margin: 0;
+  padding: 0;
+}
+
+input[type="text"] {
+  min-width: 200px;
+  width: 20vw;
+  cursor: pointer;
+}
+
+button {
+  background-color: beige;
+  border-radius: 10px;
+  border: 3px solid black;
+  padding: 10px 10px;
+  font-weight: 600;
+  transition: 0.3s;
+  color: black;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: rgb(245, 245, 188);
+  border-radius: 30px;
+}
+
 .page {
   background-color: rgb(225, 243, 237);
   width: 100%;
@@ -9,8 +36,75 @@
   align-items: center;
 }
 
-/* .selectFile { text-align: center; } */
+.selectFile {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
 
+.selectFile input[type="file"] {
+  position: absolute;
+  opacity: 0;
+}
+
+
+/*Form Style*/
+.searchForm {
+  display: flex;
+  column-gap: 20px;
+}
+
+.searchForm_wrap {
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
+}
+
+.searchForm input[type="text"] {
+  border-radius: 6px;
+}
+
+.unvalid {
+  border: 3px solid red;
+}
+
+
+/*Form Help container style*/
+.searchForm__help {
+  position: relative;
+}
+
+.searchForm__help_toggle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgb(120, 120, 120);
+  background-color: aqua;
+  color: red;
+  font-size: 20px;
+  text-align: center;
+  cursor: help;
+  vertical-align: bottom;
+  font-style: italic;
+}
+
+.searchForm__help_information { display: none; }
+.importantInf { color: rgb(207, 55, 55); }
+
+.activeInformation {
+  display: block;
+  position: absolute;
+  background-color: rgb(213, 255, 255);
+  border: 2px solid black;
+  padding: 10px;
+  width: 160px;
+}
+
+
+/*Table Style*/
 .outputTable {
   border-collapse: separate;
   border-spacing: 0 6px;
@@ -26,6 +120,7 @@
   transition: 0.5s;
   border: 1px dashed rgb(54, 140, 100);
   text-align: center;
+  cursor: copy;
 }
 
 .outputTable__body tr > td:first-child {
@@ -37,36 +132,10 @@
   background-color: aqua;
 }
 
-/*Custom button*/
-.selectFile {
-  position: relative;
-  overflow: hidden;
-  display: inline-flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.selectFile input[type="file"] {
-  position: absolute;
-  opacity: 0;
-}
-.selectFile button {
-  background-color: beige;
-  border-radius: 10px;
-  border: 3px solid black;
-  padding: 10px 0;
-  font-weight: 600;
-  transition: 0.3s;
-}
-.selectFile button:hover {
-  background-color: rgb(245, 245, 188);
-  border-radius: 30px;
-}
 
 /*Custom Check-box*/
 .check-button {
   display: flex;
-  justify-content: center;
 }
 .check-button label {
   font-size: 0.8em;
@@ -79,8 +148,4 @@
   height: 20px;
   background-color: #ccc;
   border-radius: 4px;
-}
-
-.unvalid {
-  border: 3px solid red;
 }

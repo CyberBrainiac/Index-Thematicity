@@ -11,7 +11,8 @@
   <body class="page">
     <main class="pageContent">
       <div class="selectFile">
-        <h2>Select XLSX File</h2>
+        <h2>Select Excel.xlsx file</h2>
+        <!-- Start reading file -->
         <input
           type="file"
           id="xlsxFileInput"
@@ -24,25 +25,43 @@
       </div>
 
       <form class="searchForm">
-        <p style="color: red">
-          This field is analog of query "site:example.com" in google search. If the site is <span class="importantInf">specified<span> search only for this site, else search for <span class="importantInf">all</span> sites from table.
+        <div class="searchForm_wrap">
+          <input
+            type="text"
+            name="inputUrl"
+            class="searchForm__inputUrl"
+            placeholder="url/example.com"
+            onclick="select()"
+            disabled
+          />
+          <div class="searchForm__help">
+            <div class="searchForm__help_toggle">i</div>
+            <div class="searchForm__help_information">
+              <p>
+                This field is analog of query "site:example.com" in google search. If the site is <span class="importantInf">specified</span> search only for this site, else search for <span class="importantInf">all</span> sites from table.
+              </p>
+            </div>
+          </div>
+        </div>
 
-					DO IT STIKY!!!
-        </p>
-        <input
-          type="text"
-          class="searchForm__inputUrl"
-          placeholder="url/example.com"
-					disabled
-        />
-        <p>Any query as in google search.</p>
-        <input
-          type="text"
-          class="searchForm__inputQuery"
-          placeholder='intitle:"windows"'
-					disabled
-        />
-        <input type="submit" value="Search" class="searchForm__button" disabled />
+        <div class="searchForm_wrap">
+          <input
+            type="text"
+            name="inputQuery"
+            class="searchForm__inputQuery"
+            placeholder='intitle:"windows"'
+            onclick="select()"
+            required
+            disabled
+          />
+          <div class="searchForm__help">
+            <div class="searchForm__help_toggle">i</div>
+            <div class="searchForm__help_information">
+              <p>Any query as in google search.</p>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="searchForm__button" disabled>Search in Google</button>
       </form>
 
       <table class="outputTable">

@@ -1,4 +1,12 @@
+const searchForm__button = document.querySelector(".searchForm__button");
+const searchForm = document.querySelector(".searchForm");
+const searchForm__helps = document.querySelectorAll(".searchForm__help");
+
 let arrURL_objects = [];
+searchForm.addEventListener("submit", searchForm_handler);
+searchForm__helps.forEach((elem) => {
+  elem.addEventListener("click", searchForm__help_handler);
+});
 
 function handleFile(input) {
   const file = input.files[0];
@@ -9,7 +17,6 @@ function handleFile(input) {
   const searchForm__inputQuery = document.querySelector(
     ".searchForm__inputQuery"
   );
-  const searchForm__button = document.querySelector(".searchForm__button");
 
   if (!file) {
     alert("Select file");
@@ -17,7 +24,6 @@ function handleFile(input) {
   }
 
   selectFileButton.textContent = file.name;
-  searchForm__button.addEventListener("click", searchForm_handler);
 
   /**Read File.xlsx*/
   reader.onload = function (event) {
@@ -25,7 +31,6 @@ function handleFile(input) {
     const workbook = XLSX.read(data, { type: "array" });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]; //Excel tab 1
     const tableData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    const tableBody = document.querySelector(".outputTable__body");
 
     /**Create objects with URL and data*/
     const headerURL_index = tableData[0].findIndex(
@@ -37,16 +42,15 @@ function handleFile(input) {
         arrURL_objects.push({
           [Symbol("addedIndex")]: index.toString(),
           url: row[headerURL_index],
-          totalPage: 0,
-          targetPage: 0,
-          thematicIndex: index,
+          totalPage: '',
+          targetPage: '',
+          thematicIndex: '',
         });
       }
     });
 
     /**Create and fill row in table*/
     createTableRow(arrURL_objects);
-    console.log(arrURL_objects);
 
     /**Enable inputs field*/
     checkbox.disabled = false;
@@ -55,20 +59,9 @@ function handleFile(input) {
     searchForm__button.disabled = false;
 
     /**Filter table column*/
-    checkbox.addEventListener("change", (ev) => {
-      while (tableBody.firstChild) {
-        tableBody.removeChild(tableBody.firstChild); //clear table
-      }
-
-      if (ev.target.checked) {
-        //is checkbox active?
-        let sortedArrURL_objects = [...arrURL_objects].sort(compareURLObject);
-        createTableRow(sortedArrURL_objects);
-      } else {
-        createTableRow(arrURL_objects);
-      }
-    });
+    checkbox.addEventListener("change", sortThematicIndex); 
   };
+
   reader.onerror = (err) => {
     console.log("File reader Error:", err);
   };
@@ -76,39 +69,71 @@ function handleFile(input) {
 }
 
 function searchForm_handler(ev) {
-  const formData = new FormData(ev.target);
-  const searchForm__inputUrl = document.querySelector(".searchForm__inputUrl");
-
   ev.preventDefault();
+  const formData = new FormData(this);
+  const searchForm__inputUrl = document.querySelector(".searchForm__inputUrl");
+  let urlArr = [];
+
+  for (const urlObj of arrURL_objects) {
+    Object.entries(urlObj).forEach( ([key, value]) => {if(key === 'url') urlArr.push(value)});
+  }
 
   /**Input validate*/
-  if (formData.get("searchForm__inputUrl")) {
-    let allObjValues = [];
+  // if(formData.get("inputQuery")) {
+  //   searchForm__inputUrl.classList.remove("unvalid");
+  //   searchForm__inputQuery.setCustomValidity('');
+  // } else {
+  //   searchForm__inputUrl.classList.add("unvalid");
+  //   searchForm__inputQuery.setCustomValidity('Write query to Google');
+  // }
 
-    for (const urlObj of arrURL_objects) {
-      allObjValues.push(Object.values(urlObj));
-    }
-    if (allObjValues.includes(formData.get("searchForm__inputUrl"))) {
-      formData.set("urlQueryCount", "oneUrl");
+  if (formData.get("inputUrl")) {
+    if (urlArr.includes(formData.get("inputUrl"))) {
+      formData.set("url", JSON.stringify( [formData.get("inputUrl")]));
       searchForm__inputUrl.classList.remove("unvalid");
-      searchForm__inputUrl.setCustomValidity("");
     } else {
       searchForm__inputUrl.classList.add("unvalid");
-      searchForm__inputUrl.setCustomValidity("this URL is not in the table");
+      alert("This URL is not in file.xlxs");
       return null;
     }
   } else {
-    formData.set("urlQueryCount", "all");
+    formData.set("url", JSON.stringify(urlArr));
   }
+
+  /**Call Google API*/
+  searchForm__button.disabled = true;
+  arrURL_objects = connectApi(arrURL_objects, formData);
+}
+
+function sortThematicIndex(ev) {
+  if (ev.target.checked) {
+    //is checkbox active?
+
+    let sortedArrURL_objects = [...arrURL_objects].sort(compareURLObject);
+    createTableRow(sortedArrURL_objects);
+  } else {
+    createTableRow(arrURL_objects);
+  }
+}
+
+function searchForm__help_handler() {
+  const searchForm__help_information = this.children[1];
+  searchForm__help_information.classList.toggle('activeInformation');
 }
 
 function createTableRow(arrURL_objects) {
   const tableBody = document.querySelector(".outputTable__body");
 
-  for (const row of arrURL_objects) {
+  /**Clear table row*/
+  while (tableBody.firstChild) {
+    tableBody.removeChild(tableBody.firstChild); //clear table
+  }
+
+  /**Create table row*/
+  for (const urlObj of arrURL_objects) {
     const tableRow = document.createElement("tr");
 
-    for (const [key, value] of Object.entries(row)) {
+    for (const [key, value] of Object.entries(urlObj)) {
       const tableCell = document.createElement("td");
       tableCell.textContent = value;
       tableCell.addEventListener("click", userClickOnCell_handler);
@@ -130,4 +155,15 @@ function userClickOnCell_handler(ev) {
 
 function compareURLObject(a, b) {
   return b.thematicIndex - a.thematicIndex;
+}
+
+/**Async connectAPI answer*/
+function asyncReturnValue(arrURL) {
+  const checkbox = document.getElementById("myCheckbox");
+
+  checkbox.checked = false;
+  arrURL_objects = arrURL;
+
+  createTableRow(arrURL_objects);
+  searchForm__button.disabled = false;
 }

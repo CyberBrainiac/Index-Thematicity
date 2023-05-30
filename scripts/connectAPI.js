@@ -1,4 +1,4 @@
-function connectApi(arrURL_objects, settings) {
+function connectApi(arrURL_objects, formData) {
   /**CHANGE 2 VALUES BELOW AND SAVE*/
 
   const cx = "62fa1c39e6b7f4a66"; //identeficator of programmatic seach engine
@@ -6,54 +6,113 @@ function connectApi(arrURL_objects, settings) {
 
   /**CHANGE 2 VALUES ABOVE AND SAVE*/
 
-  const parameters = {};
-  const request = `https://www.googleapis.com/customsearch/v1?[${parameters}]`;
-  const exactTerms = "windows"; //define phrase contained in the search result
-  const hl = "en"; //define language, optimize search speed and result
-  const lr = "en"; //define search page language
-  const linkSite = "techwibe.com";
-  const q = ""; //request
 
-  // const sites = ["techwibe.com", "hackread.com", "rswebsols.com", "macobserver.com", "cointiply.com", "lowendmac.com", "computertechreviews.com", "codecondo.com", "programminginsider.com", "dashtech.org", "computingforgeeks.com", "imcgrupo.com", "knowtechie.com", "marketbusinessnews.com"];
-  const sites = ["techwibe.com", "hackread.com"];
+  const query = formData.get('inputQuery');
+  const sites = JSON.parse(formData.get('url'));
 
-  const searchInTitle = async (site) => {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=intitle:%22windows%22%20site:${site}&fields=searchInformation`;
-    const response = await fetch(url);
-    const json = await response.json();
-    console.log(
-      site + " intitle:'windows'",
-      json.searchInformation.totalResults
-    );
-    return json.searchInformation.totalResults;
-  };
+  calculateRatio().then((arrURL_objects) => {
+    asyncReturnValue(arrURL_objects);
+  })
+  .catch((error) => {
+    alert("something broken ;(");
+    console.error(error);
+  });
 
-  const searchSite = async (site) => {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=site:${site}&fields=searchInformation`;
-    const response = await fetch(url);
-    const json = await response.json();
-    console.log(site, json.searchInformation.totalResults);
-    return json.searchInformation.totalResults;
-  };
-
-  const calculateRatio = async () => {
-    const ratios = [];
+  async function calculateRatio() {
     for (const site of sites) {
-      const windowsCount = await searchInTitle(site);
-      const siteCount = await searchSite(site);
-      const ratio = windowsCount / siteCount;
-      ratios.push({ site, ratio });
+
+      await waitDONTspum();
+      const targetPage = await searchWithQuery(site);
+      let thematicIndex = 0;
+
+      for (const obj of arrURL_objects) {
+        if(obj.url === site) {
+          obj.targetPage = targetPage;
+
+          /**If we have totalPage value, we wont do one more request*/
+          if(obj.totalPage) {
+            thematicIndex = targetPage / obj.totalPage;
+            let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
+            obj.thematicIndex = truncatedThematicIndex;
+
+          } else {
+            await waitDONTspum();
+            const totalPage = await searchSite(site);
+            thematicIndex = targetPage / totalPage;
+            let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
+            obj.thematicIndex = truncatedThematicIndex;
+            obj.totalPage = totalPage;
+          }
+        }
+      }
+      createTableRow(arrURL_objects) //update table in real time
     }
-    return ratios;
+
+    return arrURL_objects;
   };
 
-  calculateRatio()
-    .then((ratios) => {
-      console.table(ratios);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  async function searchWithQuery(site) {
+    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}%20site:${site}&fields=searchInformation`;
+    let response;
 
-  return arrURL_objects;
+    try {
+      response = await fetch(url);
+    } catch (error) {
+      console.error(error);
+    }
+
+    if(response.ok) {
+      console.log(2);
+      const json = await response.json();
+      console.log(
+        site,
+        "target: ",
+        json.searchInformation.totalResults
+      );
+      return json.searchInformation.totalResults;
+    } else {
+      checkHTTPError(response.status);
+      return '';
+    }
+  }
+
+  async function searchSite(site) {
+    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=site:${site}&fields=searchInformation`;
+    let response;
+
+    try {
+      response = await fetch(url);
+    } catch (error) {
+      console.error(error);
+    }
+
+    if(response.ok) {
+      const json = await response.json();
+      console.log(
+        site, 
+        "total: ",
+        json.searchInformation.totalResults
+      );
+      return json.searchInformation.totalResults;
+    } else {
+      checkHTTPError(response.status);
+      return '';
+    }
+  }
+
+  async function waitDONTspum() {
+    setTimeout(() => console.log("wait 500"), 500);
+  }
+
+  function checkHTTPError(errCode) {
+    if(errCode === 429) {
+      console.log("Error: too many request to google API");
+    }
+    else if(errCode === 500) {
+      console.log("Error: internal server error");
+    }
+    else {
+      console.error(`Error code: ${errCode}`);
+    }
+  }
 }
