@@ -6,6 +6,7 @@ const searchForm__helps = document.querySelectorAll(".searchForm__help");
 const copyThematicIndex_button = document.getElementById(
   "copyThematicIndex_button"
 );
+const copyTotalPage_button = document.getElementById("copyTotalPage_button");
 
 let arrURL_objects = [];
 searchForm.addEventListener("submit", searchForm_handler);
@@ -16,6 +17,8 @@ copyThematicIndex_button.addEventListener(
   "click",
   copyThematicIndex_button_handler
 );
+copyTotalPage_button.addEventListener("click", copyTotalPage_button_handler)
+
 
 function handleFile(input) {
   const file = input.files[0];
@@ -41,18 +44,37 @@ function handleFile(input) {
 
     /**Create objects with URL and data*/
     const headerURL_index = tableData[0].findIndex(
-      (elem) => elem.toLowerCase() === "url"
+      (elem) => {
+        if(elem !== undefined) {return elem.toLowerCase() === "url";}
+      }
     );
+
+    const headerTotalPage_index = tableData[0].findIndex(
+      (elem) => {
+        if(elem !== undefined) {return elem.toLowerCase() === "total page";}
+      }
+    );
+
+    if(headerURL_index === -1) {
+      alert("Excel file does not contain column 'URL' in first row");
+    }
+    if(headerTotalPage_index === -1) {
+      alert("Excel file does not contain column 'Total Page' in first row");
+    }
 
     tableData.forEach((row, index) => {
       if (index !== 0 && row[headerURL_index] !== undefined) {
-        arrURL_objects.push({
+        const templateObj = {
           [Symbol("addedIndex")]: index.toString(),
-          url: row[headerURL_index],
+          url: "",
           totalPage: "",
           targetPage: "",
           thematicIndex: "",
-        });
+        }
+
+        templateObj.url = row[headerURL_index];
+        templateObj.totalPage = row[headerTotalPage_index];
+        arrURL_objects.push(templateObj);
       }
     });
 
@@ -65,6 +87,7 @@ function handleFile(input) {
     searchForm__inputQuery.disabled = false;
     searchForm__button.disabled = false;
     copyThematicIndex_button.disabled = false;
+    copyTotalPage_button.disabled = false;
 
     /**Filter table column*/
     checkbox.addEventListener("change", sortThematicIndex);
@@ -75,6 +98,7 @@ function handleFile(input) {
   };
   reader.readAsArrayBuffer(file);
 }
+
 
 function searchForm_handler(ev) {
   ev.preventDefault();
@@ -113,11 +137,13 @@ function searchForm_handler(ev) {
   /**Call Google API*/
   searchForm__button.disabled = true;
   copyThematicIndex_button.disabled = true;
+  copyTotalPage_button.disabled = true;
   selectFileButton.disabled = true;
   checkbox.disabled = true;
 
   arrURL_objects = connectApi(arrURL_objects, formData);
 }
+
 
 function sortThematicIndex(ev) {
   if (ev.target.checked) {
@@ -130,10 +156,12 @@ function sortThematicIndex(ev) {
   }
 }
 
+
 function searchForm__help_handler() {
   const searchForm__help_information = this.children[1];
   searchForm__help_information.classList.toggle("activeInformation");
 }
+
 
 function createTableRow(arrURL_objects) {
   const tableBody = document.querySelector(".outputTable__body");
@@ -157,10 +185,12 @@ function createTableRow(arrURL_objects) {
   }
 }
 
+
 function userClickOnCell_handler(ev) {
   const text = ev.target.textContent;
   navigator.clipboard.writeText(text);
   copyThematicIndex_button.style.backgroundColor = "beige";
+  copyTotalPage_button.style.backgroundColor = "beige";
 
   ev.target.classList.toggle("highlight");
   setTimeout(() => {
@@ -168,15 +198,18 @@ function userClickOnCell_handler(ev) {
   }, 1000);
 }
 
+
 function compareURLObject(a, b) {
   return b.thematicIndex - a.thematicIndex;
 }
+
 
 function copyThematicIndex_button_handler() {
   let thematicIndexArr = [];
   let copyStr = "";
 
   copyThematicIndex_button.style.backgroundColor = "#cbe2be";
+  copyTotalPage_button.style.backgroundColor = "beige";
 
   for (const urlObj of arrURL_objects) {
     Object.entries(urlObj).forEach(([key, value]) => {
@@ -192,6 +225,28 @@ function copyThematicIndex_button_handler() {
   navigator.clipboard.writeText(copyStr);
 }
 
+
+function copyTotalPage_button_handler() {
+  let totalPageArr = [];
+  let copyStr = "";
+
+  copyTotalPage_button.style.backgroundColor = "#cbe2be";
+  copyThematicIndex_button.style.backgroundColor = "beige";
+
+  for (const urlObj of arrURL_objects) {
+    Object.entries(urlObj).forEach(([key, value]) => {
+      if (key === "totalPage") totalPageArr.push(value);
+    });
+  }
+
+  for (const totalPage of totalPageArr) {
+    copyStr += totalPage.toString();
+    copyStr += "\n";
+  }
+
+  navigator.clipboard.writeText(copyStr);
+}
+
 /**Async connectAPI answer*/
 function asyncReturnValue(arrURL) {
   const checkbox = document.getElementById("myCheckbox");
@@ -200,6 +255,8 @@ function asyncReturnValue(arrURL) {
   checkbox.checked = false;
   copyThematicIndex_button.disabled = false;
   copyThematicIndex_button.style.backgroundColor = "beige";
+  copyTotalPage_button.disabled = false;
+  copyTotalPage_button.style.backgroundColor = "beige";
   searchForm__button.disabled = false;
   selectFileButton.disabled = false;
 

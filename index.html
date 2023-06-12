@@ -26,6 +26,9 @@
 
       <form class="searchForm">
         <div class="searchForm_wrap">
+          <div class="searchForm__label">
+            <span>Site URL:</span>
+          </div>
           <input
             type="text"
             name="inputUrl"
@@ -49,6 +52,9 @@
         </div>
 
         <div class="searchForm_wrap">
+          <div class="searchForm__label">
+            <span>Request in Google:</span>
+          </div>
           <input
             type="text"
             name="inputQuery"
@@ -74,11 +80,18 @@
         <thead>
           <tr>
             <th>Url</th>
-            <th>Total page</th>
+            <th>
+              <p>Total page</p>
+              <input
+                  type="button"
+                  id="copyTotalPage_button"
+                  value="copy"
+                  disabled
+              />
+            </th>
             <th>Target page</th>
             <th>
-              Thematic index
-              <br />
+              <p>Thematic index</p>
               <div class="check-button">
                 <label for="myCheckbox">sort</label>
                 <input type="checkbox" id="myCheckbox" disabled />

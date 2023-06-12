@@ -65,9 +65,7 @@ function connectApi(arrURL_objects, formData) {
   }
 
   async function searchWithQuery(site) {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(
-      query
-    )}%20site:${site}&fields=searchInformation`;
+    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}%20site:${site}&fields=searchInformation`;
     let response;
 
     try {
@@ -77,7 +75,6 @@ function connectApi(arrURL_objects, formData) {
     }
 
     if (response.ok) {
-      console.log(2);
       const json = await response.json();
       console.log(site, "target: ", json.searchInformation.totalResults);
       return json.searchInformation.totalResults;

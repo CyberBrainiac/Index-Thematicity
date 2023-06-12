@@ -18,6 +18,7 @@ button {
   transition: 0.3s;
   color: black;
   cursor: pointer;
+  max-width: 200px;
 }
 
 button:hover {
@@ -41,7 +42,8 @@ button:hover {
   overflow: hidden;
   display: inline-flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  align-items: center;
+  margin-bottom: 50px;
   letter-spacing: 1px;
 }
 
@@ -53,17 +55,27 @@ button:hover {
 /*Form Style*/
 .searchForm {
   display: flex;
-  column-gap: 20px;
+  flex-direction: column;
+  row-gap: 10px;
 }
 
 .searchForm_wrap {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   column-gap: 4px;
+}
+
+.searchForm__label {
+  display: inline-block;
 }
 
 .searchForm input[type="text"] {
   border-radius: 6px;
+}
+
+.searchForm__button {
+  align-self: center;
 }
 
 .unvalid {
@@ -103,15 +115,8 @@ button:hover {
   border: 2px solid black;
   padding: 10px;
   width: 160px;
-}
-
-#copyThematicIndex_button {
-  font-size: 0.8em;
-  color: rgb(119, 149, 149);
-  width: 100px;
-  background-color: beige;
-  border-radius: 10px;
-  border: 1px solid black;
+  top: 0;
+  left: 120%;
 }
 
 /*Table Style*/
@@ -159,6 +164,17 @@ button:hover {
   background-color: #ccc;
   border-radius: 4px;
 }
+
+#copyThematicIndex_button, #copyTotalPage_button {
+  font-size: 0.8em;
+  color: rgb(119, 149, 149);
+  width: 100px;
+  background-color: beige;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+
+
 
 .errorContainer {
   font-size: 18px;
