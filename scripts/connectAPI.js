@@ -1,10 +1,22 @@
 function connectApi(arrURL_objects, formData) {
-  /**CHANGE 2 VALUES BELOW AND SAVE*/
 
+  /**CHANGE 2 VALUES BELOW AND SAVE*/
   const cx = "62fa1c39e6b7f4a66"; //identeficator of programmatic seach engine
   const apiKey = "AIzaSyB6jxLovSRB87xAoxImfXzweaf3kKUWexg"; //your API key
-
   /**CHANGE 2 VALUES ABOVE AND SAVE*/
+
+  /**
+  *    ABOUT DELAY SETTINGS
+  * 
+  * 1. limit_package_urls -- (work with fixed count of urls)
+  * 2. step -- do request for one url
+  */
+  const limit_package_urls = 90; //value set limit for count of site urls, which process in one iteration.
+  const delay_between_iterations = 66000; //value set delay after finish each iteration in MILLISECONDS. 70000 milliseconds = 66 seconds 
+  const delay_between_steps = 100; //value set delay before each request in MILLISECONDS. 100 milliseconds = 0.1 second
+
+
+
 
   const query = formData.get("inputQuery");
   const sites = JSON.parse(formData.get("url"));
@@ -24,9 +36,16 @@ function connectApi(arrURL_objects, formData) {
     });
 
   async function calculateIndex() {
-    for (const site of sites) {
-      await waitDONTspum();
+    for (let iteration = 0, site = sites[iteration];
+      iteration < sites.length;
+      iteration++, site = sites[iteration]) {
+
+      if (iteration !== 0 && iteration % limit_package_urls == 0) {
+        await waitIteration();
+      }
+
       const targetPage = await searchWithQuery(site);
+      await waitStep();
       let thematicIndex = 0;
 
       for (const obj of arrURL_objects) {
@@ -43,8 +62,8 @@ function connectApi(arrURL_objects, formData) {
             let truncatedThematicIndex = Number(thematicIndex.toFixed(4));
             obj.thematicIndex = truncatedThematicIndex;
           } else {
-            await waitDONTspum();
             const totalPage = await searchSite(site);
+            await waitStep();
 
             if (totalPage === null) {
               obj.totalPage = "";
@@ -104,10 +123,12 @@ function connectApi(arrURL_objects, formData) {
     }
   }
 
-  async function waitDONTspum() {
-    setTimeout(() => {
-      let a = "something";
-    }, 100);
+  async function waitStep() {
+    return new Promise(resolve => setTimeout(resolve, delay_between_steps));
+  }
+
+  async function waitIteration() {
+    return new Promise(resolve => setTimeout(resolve, delay_between_iterations));
   }
 
   function checkHTTPError(response, site) {

@@ -1,4 +1,6 @@
+
 const selectFileButton = document.querySelector(".selectFile > button");
+const xlsxFileInput = document.getElementById("xlsxFileInput");
 const checkbox = document.getElementById("myCheckbox");
 const searchForm__button = document.querySelector(".searchForm__button");
 const searchForm = document.querySelector(".searchForm");
@@ -9,6 +11,7 @@ const copyThematicIndex_button = document.getElementById(
 const copyTotalPage_button = document.getElementById("copyTotalPage_button");
 
 let arrURL_objects = [];
+xlsxFileInput.addEventListener("change", () => {handleFile(xlsxFileInput)});
 searchForm.addEventListener("submit", searchForm_handler);
 searchForm__helps.forEach((elem) => {
   elem.addEventListener("click", searchForm__help_handler);
